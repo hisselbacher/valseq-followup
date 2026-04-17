@@ -1,112 +1,147 @@
-<script>
-  // ⚠️ IMPORTANT: Replace this URL with your actual Google Apps Script deployment URL
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxamKeVOnwpXUgL0JEwvlBjZLq-VIkveaojYvjVjT-cfCWQcWHGQJkOhwhUdWNPSI97/exec';
-  
-  const form = document.getElementById('pidForm');
-  const pidInput = document.getElementById('pid');
-  const submitBtn = document.getElementById('submitBtn');
-  const errorMessage = document.getElementById('errorMessage');
-  const loadingScreen = document.getElementById('loadingScreen');
-  
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const pid = pidInput.value.trim();
-    
-    if (!pid) {
-      showError('Please enter your Prolific ID');
-      return;
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Survey Access</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
     
-    // Clear previous errors
-    errorMessage.classList.remove('show');
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
     
-    // Show button loading
-    submitBtn.disabled = true;
-    submitBtn.classList.add('loading');
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+    }
     
-    // Create an iframe to load the Apps Script response
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.name = 'redirectFrame';
-    document.body.appendChild(iframe);
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
     
-    // Create a form that submits to the iframe
-    const redirectForm = document.createElement('form');
-    redirectForm.method = 'GET';
-    redirectForm.action = APPS_SCRIPT_URL;
-    redirectForm.target = 'redirectFrame';
+    .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
     
-    const pidField = document.createElement('input');
-    pidField.type = 'hidden';
-    pidField.name = 'pid';
-    pidField.value = pid;
-    redirectForm.appendChild(pidField);
+    h1 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
     
-    document.body.appendChild(redirectForm);
-    redirectForm.submit();
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
     
-    // Monitor the iframe for the redirect
-    let checkCount = 0;
-    const maxChecks = 50; // Check for 5 seconds
+    .form-group {
+      margin: 25px 0;
+    }
     
-    const checkInterval = setInterval(function() {
-      checkCount++;
+    label {
+      display: block;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin-top: 10px;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      color: #999;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🔍</div>
+      <h1>Participant Survey Access</h1>
+      <p class="subtitle">Enter your Prolific ID to access your personalized survey</p>
+    </div>
+    
+    <!-- Simple form that directly submits to Apps Script -->
+    <form method="GET" action="https://script.google.com/macros/s/AKfycbxamKeVOnwpXUgL0JEwvlBjZLq-VIkveaojYvjVjT-cfCWQcWHGQJkOhwhUdWNPSI97/exec">
+      <div class="form-group">
+        <label for="pid">Prolific ID *</label>
+        <input 
+          type="text" 
+          id="pid" 
+          name="pid" 
+          required 
+          placeholder="e.g., 5f8a9b2c3d4e5f6a7b8c9d0e"
+          autocomplete="off"
+        >
+      </div>
       
-      try {
-        // Try to read the iframe content
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        const html = iframeDoc.documentElement.innerHTML;
-        
-        // Look for REDCap URL
-        const urlPattern = /https?:\/\/redcap\.stanford\.edu[^\s"'<>]*/g;
-        const matches = html.match(urlPattern);
-        
-        if (matches && matches.length > 0) {
-          clearInterval(checkInterval);
-          const surveyLink = matches[0];
-          
-          // Show success screen
-          loadingScreen.classList.add('show');
-          
-          // Cleanup
-          document.body.removeChild(iframe);
-          document.body.removeChild(redirectForm);
-          
-          // Redirect
-          setTimeout(function() {
-            window.location.href = surveyLink;
-          }, 1000);
-        } else if (html.toLowerCase().includes('error') || html.toLowerCase().includes('not found')) {
-          clearInterval(checkInterval);
-          showError('No matching participant found. Please check your Prolific ID.');
-          submitBtn.disabled = false;
-          submitBtn.classList.remove('loading');
-          document.body.removeChild(iframe);
-          document.body.removeChild(redirectForm);
-        }
-      } catch (e) {
-        // Can't read iframe (cross-origin), wait for it to load
-      }
-      
-      if (checkCount >= maxChecks) {
-        clearInterval(checkInterval);
-        showError('Request timed out. Please try again.');
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('loading');
-        try {
-          document.body.removeChild(iframe);
-          document.body.removeChild(redirectForm);
-        } catch(e) {}
-      }
-    }, 100);
-  });
-  
-  function showError(message) {
-    errorMessage.textContent = message;
-    errorMessage.classList.add('show');
-  }
-  
-  // Auto-focus
-  pidInput.focus();
-</script>
+      <button type="submit">
+        Continue to Survey →
+      </button>
+    </form>
+    
+    <div class="footer">
+      Need help? Contact support.
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('pid').focus();
+  </script>
+</body>
+</html>
