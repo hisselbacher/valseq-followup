@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Survey Access</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    h1 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .form-group {
+      margin: 25px 0;
+    }
+    
+    label {
+      display: block;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    input[type="text"]::placeholder {
+      color: #999;
+    }
+    
+    .help-text {
+      font-size: 12px;
+      color: #666;
+      margin-top: 6px;
+    }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 10px;
+    }
+    
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .spinner {
+      display: none;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    button.loading .button-text {
+      display: none;
+    }
+    
+    button.loading .spinner {
+      display: block;
+    }
+    
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 14px;
+      display: none;
+      border-left: 4px solid #c62828;
+    }
+    
+    .error-message.show {
+      display: block;
+    }
+    
+    .loading-screen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .loading-screen.show {
+      display: flex;
+    }
+    
+    .loading-box {
+      text-align: center;
+      background: white;
+      padding: 60px 50px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    
+    .loading-box .checkmark {
+      font-size: 72px;
+      animation: bounce 0.6s;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    
+    .loading-box h2 {
+      color: #333;
+      margin: 25px 0 15px;
+      font-size: 28px;
+    }
+    
+    .loading-box p {
+      color: #666;
+      font-size: 16px;
+    }
+    
+    .big-spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #667eea;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: 30px auto 0;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      color: #999;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="mainForm">
+    <div class="header">
+      <div class="logo">🔍</div>
+      <h1>Participant Survey Access</h1>
+      <p class="subtitle">Enter your Prolific ID to access your personalized survey</p>
+    </div>
+    
+    <form id="pidForm">
+      <div class="form-group">
+        <label for="pid">Prolific ID *</label>
+        <input 
+          type="text" 
+          id="pid" 
+          name="pid" 
+          required 
+          placeholder="e.g., 5f8a9b2c3d4e5f6a7b8c9d0e"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <p class="help-text">Your Prolific ID is a unique identifier provided to you by Prolific.</p>
+      </div>
+      
+      <button type="submit" id="submitBtn">
+        <span class="button-text">Continue to Survey →</span>
+        <div class="spinner"></div>
+      </button>
+      
+      <div class="error-message" id="errorMessage"></div>
+    </form>
+    
+    <div class="footer">
+      Need help? Contact support if you're having trouble.
+    </div>
+  </div>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-box">
+      <div class="checkmark">✓</div>
+      <h2>Success!</h2>
+      <p>Redirecting to your survey...</p>
+      <div class="big-spinner"></div>
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ IMPORTANT: Replace this URL with your actual Google Apps Script deployment URL
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxamKeVOnwpXUgL0JEwvlBjZLq-VIkveaojYvjVjT-cfCWQcWHGQJkOhwhUdWNPSI97/exec';
+    
+    const form = document.getElementById('pidForm');
+    const pidInput = document.getElementById('pid');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const loadingScreen = document.getElementById('loadingScreen');
+    
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const pid = pidInput.value.trim();
+      
+      if (!pid) {
+        showError('Please enter your Prolific ID');
+        return;
+      }
+      
+      // Clear previous errors
+      errorMessage.classList.remove('show');
+      
+      // Show button loading
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+      
+      try {
+        // Call Apps Script
+        const response = await fetch(APPS_SCRIPT_URL + '?pid=' + encodeURIComponent(pid), {
+          redirect: 'follow'
+        });
+        
+        const html = await response.text();
+        
+        // Extract REDCap survey link from the HTML response
+        // Look for URLs containing redcap.stanford.edu
+        const urlPattern = /https?:\/\/redcap\.stanford\.edu[^\s"'<>]*/g;
+        const matches = html.match(urlPattern);
+        
+        if (matches && matches.length > 0) {
+          // Found the survey link!
+          const surveyLink = matches[0];
+          
+          // Show success screen
+          loadingScreen.classList.add('show');
+          
+          // Redirect after brief moment
+          setTimeout(function() {
+            window.location.href = surveyLink;
+          }, 1000);
+          
+        } else {
+          // No survey link found - might be an error
+          // Check if it's an error message
+          if (html.toLowerCase().includes('error') || html.toLowerCase().includes('not found')) {
+            showError('No matching participant found. Please check your Prolific ID.');
+          } else {
+            showError('Unable to generate survey link. Please try again or contact support.');
+          }
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('loading');
+        }
+        
+      } catch (error) {
+        console.error('Error:', error);
+        showError('Connection error. Please check your internet and try again.');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+      }
+    });
+    
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('show');
+    }
+    
+    // Auto-focus
+    pidInput.focus();
+  </script>
+</body>
+</html>
